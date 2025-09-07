@@ -80,8 +80,8 @@ export default function Home() {
     </div>
 
       {/* Barra de porcentaje */}
-      <div className="w-full mb-5">
-        <div className="flex justify-between mb-2">
+      <div className="w-full m-2">
+        <div className="flex justify-between ">
           <span className="text-larger">Porcentaje de mesas totales</span>
           <span className="text-larger font-medium">
             {isLoading ? <span className="loading-text">Cargando...</span> : `${porcentaje}%`}
@@ -97,8 +97,8 @@ export default function Home() {
       </div>
 
   {/* Votantes */}
-  <h2 className="section-title mt-6 mb-4">Votantes que pasaron</h2>
-  <div className="w-full flex justify-between mb-5">
+  <h2 className="section-title ">Votantes que pasaron</h2>
+  <div className="w-full flex justify-between">
     <button
       className={`option-btn votante ${votantes === 5 ? 'active' : ''}`}
       onClick={() => { 
@@ -120,9 +120,9 @@ export default function Home() {
   </div>
 
   {/* Boletas repuestas */}
-  <h2 className="section-title mt-6 mb-4">Boletas repuestas</h2>
+  <h2 className="section-title ">Boletas repuestas</h2>
   
-  <div className={`repuestas-grid grid-${votantes} mb-5`}>
+  <div className={`repuestas-grid grid-${votantes} `}>
     {/* Mostramos botones del 1 al máximo de votantes (que ahora es 5 o 10) */}
     {[...Array(votantes)].map((_, i) => (
       <button
@@ -134,21 +134,17 @@ export default function Home() {
       </button>
     ))}
   </div>
-  
-  {/* Espacio para que el botón submit no tape el contenido */}
-  <div className="pb-16"></div>
 
-      {/* Botón submit - ahora en un contenedor fijo */}
-      <div className="submit-container">
-        <button
-          className="w-full py-4 font-bold rounded-lg cursor-pointer shadow btn-submit submit-button-larger"
-          disabled={isSubmitting || isLoading} // Desactivar el botón mientras se procesa o carga
-          onClick={async () => {
+      {/* Botón submit */}
+      <button
+        className="mt-2 w-full py-4 font-bold rounded-lg cursor-pointer shadow btn-submit submit-button-larger"
+        disabled={isSubmitting || isLoading} // Desactivar el botón mientras se procesa o carga
+        onClick={async () => {
           // Evitar múltiples envíos
           if (isSubmitting) return;
           
           setIsSubmitting(true); // Indicar que está en proceso
-          
+          alert("¡Datos enviados correctamente!");
           try {
             const supabase = createClient();
             const { error } = await supabase.from("reposiciones").insert({
@@ -183,7 +179,6 @@ export default function Home() {
       >
         {isSubmitting ? "Enviando..." : "Submit"}
       </button>
-      </div>
 
   {/* El porcentaje ahora se actualiza automáticamente */}
     </div>
