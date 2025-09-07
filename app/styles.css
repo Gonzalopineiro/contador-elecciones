@@ -108,3 +108,81 @@ html, body {
   font-size: 1.5rem;
   font-weight: 600;
 }
+
+/* Estilos para botones grandes de selección */
+.option-btn {
+  width: 48%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.6rem;
+  padding: 1.5rem 0;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.option-btn.active {
+  transform: scale(0.98);
+}
+
+/* Estilos específicos para botones de votantes */
+.option-btn.votante {
+  border: 2px solid var(--green-400);
+}
+
+.option-btn.votante.active {
+  background-color: var(--green-100);
+}
+
+/* Estilos específicos para botones de repuestas */
+.option-btn.repuesta {
+  border: 2px solid var(--blue-400);
+}
+
+.option-btn.repuesta.active {
+  background-color: var(--blue-100);
+}
+
+/* Estilos para grid de botones de repuestas */
+.repuestas-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+.repuestas-grid.grid-5 .number-btn {
+  width: calc(33% - 8px); /* 3 botones por fila con espacio entre ellos */
+  height: 70px;
+}
+
+.repuestas-grid.grid-10 .number-btn {
+  width: calc(20% - 10px); /* 5 botones por fila */
+  height: 60px;
+}
+
+.number-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 2px solid var(--blue-400);
+  transition: all 0.2s ease;
+  background-color: var(--background);
+}
+
+.number-btn:active {
+  transform: scale(0.95);
+}
+
+.number-btn.active {
+  background-color: var(--blue-100);
+  border-width: 2.5px;
+  font-weight: 700;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

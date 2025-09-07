@@ -8,10 +8,8 @@ import "./styles.css";
 
 export default function Home() {
   const [porcentaje, setPorcentaje] = useState(0);
-  const [votantes, setVotantes] = useState(1);
-  const [customVotantes, setCustomVotantes] = useState("");
+  const [votantes, setVotantes] = useState(5); // Valor por defecto 5
   const [repuestas, setRepuestas] = useState(1);
-  const [customRepuestas, setCustomRepuestas] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío
   const [isLoading, setIsLoading] = useState(true); // Estado para controlar la carga inicial
   const { theme, toggleTheme } = useTheme();
@@ -29,6 +27,14 @@ export default function Home() {
     const porcentajeCalc = totalVotantes > 0 ? (totalBoletas / totalVotantes) * 100 : 0;
     return Number(porcentajeCalc.toFixed(2));
   };
+  
+  // Actualizar las repuestas si se cambian los votantes
+  useEffect(() => {
+    // Si las repuestas son mayores que los votantes, ajustar las repuestas
+    if (repuestas > votantes) {
+      setRepuestas(votantes);
+    }
+  }, [votantes, repuestas]);
 
   // Cargar datos al iniciar la aplicación
   useEffect(() => {
@@ -91,59 +97,43 @@ export default function Home() {
       </div>
 
   {/* Votantes */}
-  <h2 className="section-title mt-6 mb-3">Votantes que pasaron a cuarto oscuro</h2>
-  <div className="flex gap-3 flex-wrap mb-4">
-        {[...Array(10)].map((_, i) => (
-          <button
-            key={i + 1}
-            className={`px-4 py-3 rounded-lg font-medium cursor-pointer border button-larger votante-btn ${votantes === i + 1 ? 'active' : ''}`}
-            onClick={() => { setVotantes(i + 1); setCustomVotantes(""); if (repuestas > i + 1) setRepuestas(i + 1); }}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <input
-          type="number"
-          min={1}
-          placeholder="Otro"
-          value={customVotantes}
-          className="w-20 px-3 py-3 rounded-lg border input-custom input-larger"
-          onChange={e => {
-            const value = Number(e.target.value) || 1;
-            setCustomVotantes(e.target.value);
-            setVotantes(value);
-            if (repuestas > value) setRepuestas(value);
-          }}
-        />
-      </div>
+  <h2 className="section-title mt-6 mb-4">Votantes que pasaron</h2>
+  <div className="w-full flex justify-between mb-5">
+    <button
+      className={`option-btn votante ${votantes === 5 ? 'active' : ''}`}
+      onClick={() => { 
+        setVotantes(5); 
+        // Asegurarse de que repuestas no sea mayor que votantes
+        if (repuestas > 5) setRepuestas(5); 
+      }}
+    >
+      5
+    </button>
+    <button
+      className={`option-btn votante ${votantes === 10 ? 'active' : ''}`}
+      onClick={() => { 
+        setVotantes(10);
+      }}
+    >
+      10
+    </button>
+  </div>
 
   {/* Boletas repuestas */}
-  <h2 className="section-title mt-6 mb-3">Boletas repuestas</h2>
-  <div className="flex gap-3 flex-wrap mb-4">
-        {[...Array(10)].map((_, i) => (
-          <button
-            key={i + 1}
-            className={`px-4 py-3 rounded-lg font-medium cursor-pointer border button-larger repuesta-btn ${repuestas === i + 1 ? 'active' : ''}`}
-            onClick={() => { setRepuestas(i + 1 > votantes ? votantes : i + 1); setCustomRepuestas(""); }}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <input
-          type="number"
-          min={1}
-          max={votantes}
-          placeholder="Otro"
-          value={customRepuestas}
-          className="w-20 px-3 py-3 rounded-lg border input-custom input-larger"
-          onChange={e => {
-            let value = Number(e.target.value) || 1;
-            if (value > votantes) value = votantes;
-            setCustomRepuestas(e.target.value);
-            setRepuestas(value);
-          }}
-        />
-      </div>
+  <h2 className="section-title mt-6 mb-4">Boletas repuestas</h2>
+  
+  <div className={`repuestas-grid grid-${votantes} mb-5`}>
+    {/* Mostramos botones del 1 al máximo de votantes (que ahora es 5 o 10) */}
+    {[...Array(votantes)].map((_, i) => (
+      <button
+        key={i + 1}
+        className={`number-btn ${repuestas === i + 1 ? 'active' : ''}`}
+        onClick={() => { setRepuestas(i + 1); }}
+      >
+        {i + 1}
+      </button>
+    ))}
+  </div>
 
       {/* Botón submit */}
       <button
@@ -154,7 +144,7 @@ export default function Home() {
           if (isSubmitting) return;
           
           setIsSubmitting(true); // Indicar que está en proceso
-          alert("¡Datos enviados correctamente!");
+          
           try {
             const supabase = createClient();
             const { error } = await supabase.from("reposiciones").insert({
