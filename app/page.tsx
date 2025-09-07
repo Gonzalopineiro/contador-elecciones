@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "../utils/supabase/client";
 import { useTheme } from "./context/ThemeContext";
 import "./styles.css";
@@ -13,7 +13,50 @@ export default function Home() {
   const [repuestas, setRepuestas] = useState(1);
   const [customRepuestas, setCustomRepuestas] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío
+  const [isLoading, setIsLoading] = useState(true); // Estado para controlar la carga inicial
   const { theme, toggleTheme } = useTheme();
+
+  // Tipo para los datos de reposición
+  interface Reposicion {
+    boletas_repuestas: number | null;
+    votantes_contados: number | null;
+  }
+
+  // Función para calcular el porcentaje basado en los datos
+  const calcularPorcentaje = (data: Reposicion[]): number => {
+    const totalBoletas = data.reduce((acc: number, row: Reposicion) => acc + (row.boletas_repuestas || 0), 0);
+    const totalVotantes = data.reduce((acc: number, row: Reposicion) => acc + (row.votantes_contados || 0), 0);
+    const porcentajeCalc = totalVotantes > 0 ? (totalBoletas / totalVotantes) * 100 : 0;
+    return Number(porcentajeCalc.toFixed(2));
+  };
+
+  // Cargar datos al iniciar la aplicación
+  useEffect(() => {
+    const fetchDatos = async () => {
+      try {
+        setIsLoading(true);
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("reposiciones")
+          .select("boletas_repuestas, votantes_contados");
+
+        if (error) {
+          console.error("Error al obtener datos:", error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setPorcentaje(calcularPorcentaje(data));
+        }
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDatos();
+  }, []);
 
   // Solo mobile
   // Estilos inline para simplicidad, pero se pueden mover a CSS
@@ -34,14 +77,17 @@ export default function Home() {
       <div className="w-full mb-4">
         <div className="flex justify-between mb-1">
           <span className="text-base">Porcentaje de mesas totales</span>
-          <span className="text-base">{porcentaje}%</span>
+          <span className="text-base">
+            {isLoading ? <span className="loading-text">Cargando...</span> : `${porcentaje}%`}
+          </span>
         </div>
         <div className="rounded-lg h-4 w-full progress-bar-bg">
           <div
             className="h-4 rounded-lg transition-all progress-bar"
-            style={{ width: `${porcentaje}%` }}
+            style={{ width: isLoading ? '0%' : `${porcentaje}%` }}
           />
         </div>
+        {isLoading && <p className="text-sm mt-1 text-center loading-text">Cargando datos iniciales...</p>}
       </div>
 
   {/* Votantes */}
@@ -102,39 +148,43 @@ export default function Home() {
       {/* Botón submit */}
       <button
         className="mt-8 w-full py-3 font-bold text-lg rounded-lg cursor-pointer shadow btn-submit"
-        disabled={isSubmitting} // Desactivar el botón mientras se procesa
+        disabled={isSubmitting || isLoading} // Desactivar el botón mientras se procesa o carga
         onClick={async () => {
           // Evitar múltiples envíos
           if (isSubmitting) return;
           
           setIsSubmitting(true); // Indicar que está en proceso
           
-          const supabase = createClient();
-          const { error } = await supabase.from("reposiciones").insert({
-            mesa_id: "prueba",
-            votantes_contados: votantes,
-            boletas_repuestas: repuestas,
-          });
-          if (error) {
-            alert("Error al subir los datos: " + error.message);
-            setIsSubmitting(false); // Restablecer el estado en caso de error
-            return;
+          try {
+            const supabase = createClient();
+            const { error } = await supabase.from("reposiciones").insert({
+              mesa_id: "prueba",
+              votantes_contados: votantes,
+              boletas_repuestas: repuestas,
+            });
+            if (error) {
+              alert("Error al subir los datos: " + error.message);
+              return;
+            }
+            
+            // Consulta directa para calcular el porcentaje
+            const { data: queryData, error: queryError } = await supabase
+              .from("reposiciones")
+              .select("boletas_repuestas, votantes_contados");
+              
+            if (queryError) {
+              alert("Error al obtener datos: " + queryError.message);
+              return;
+            }
+            
+            // Usar la función reutilizable para calcular el porcentaje
+            setPorcentaje(calcularPorcentaje(queryData));
+          } catch (err) {
+            console.error("Error durante el envío:", err);
+            alert("Error inesperado durante el envío");
+          } finally {
+            setIsSubmitting(false); // Restablecer el estado cuando se completa
           }
-          // Consulta directa para calcular el porcentaje
-          const { data: queryData, error: queryError } = await supabase
-            .from("reposiciones")
-            .select("boletas_repuestas, votantes_contados");
-          if (queryError) {
-            alert("Error al obtener datos: " + queryError.message);
-            setIsSubmitting(false); // Restablecer el estado en caso de error
-            return;
-          }
-          const totalBoletas = queryData.reduce((acc, row) => acc + (row.boletas_repuestas || 0), 0);
-          const totalVotantes = queryData.reduce((acc, row) => acc + (row.votantes_contados || 0), 0);
-          const porcentajeCalc = totalVotantes > 0 ? (totalBoletas / totalVotantes) * 100 : 0;
-          setPorcentaje(Number(porcentajeCalc.toFixed(2)));
-          
-          setIsSubmitting(false); // Restablecer el estado cuando se completa
         }}
       >
         {isSubmitting ? "Enviando..." : "Submit"}

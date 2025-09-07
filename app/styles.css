@@ -51,3 +51,15 @@
 .theme-toggle:hover {
   transform: rotate(30deg);
 }
+
+/* Estilos para estados de carga */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.loading-text {
+  animation: pulse 1.5s infinite;
+  color: var(--gray-300);
+}
