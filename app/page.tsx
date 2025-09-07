@@ -23,7 +23,7 @@ export default function Home() {
       <h1 className="text-5xl font-bold text-center">Contador Elecciones</h1>
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-full theme-toggle"
+        className="p-2 rounded-full border theme-toggle"
         aria-label="Cambiar modo"
       >
         {theme === 'dark' ? '☀️' : '🌙'}
@@ -33,7 +33,7 @@ export default function Home() {
       {/* Barra de porcentaje */}
       <div className="w-full mb-4">
         <div className="flex justify-between mb-1">
-          <span className="text-base">Porcentaje con 10 mesas</span>
+          <span className="text-base">Porcentaje de mesas totales</span>
           <span className="text-base">{porcentaje}%</span>
         </div>
         <div className="rounded-lg h-4 w-full progress-bar-bg">
@@ -45,7 +45,7 @@ export default function Home() {
       </div>
 
   {/* Votantes */}
-  <h2 className="text-lg mt-6 mb-2">Votantes</h2>
+  <h2 className="text-lg mt-6 mb-2">Votantes que pasaron a cuarto oscuro</h2>
   <div className="flex gap-2 flex-wrap mb-2">
         {[...Array(10)].map((_, i) => (
           <button
@@ -72,7 +72,7 @@ export default function Home() {
       </div>
 
   {/* Voletas repuestas */}
-  <h2 className="text-lg mt-6 mb-2">Voletas repuestas</h2>
+  <h2 className="text-lg mt-6 mb-2">Boletas repuestas</h2>
   <div className="flex gap-2 flex-wrap mb-2">
         {[...Array(10)].map((_, i) => (
           <button
