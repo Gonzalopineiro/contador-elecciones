@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { createClient } from "../utils/supabase/client";
+import { useTheme } from "./context/ThemeContext";
+import "./styles.css";
 
 export default function Home() {
   const [porcentaje, setPorcentaje] = useState(0);
@@ -10,12 +12,22 @@ export default function Home() {
   const [customVotantes, setCustomVotantes] = useState("");
   const [repuestas, setRepuestas] = useState(1);
   const [customRepuestas, setCustomRepuestas] = useState("");
+  const { theme, toggleTheme } = useTheme();
 
   // Solo mobile
   // Estilos inline para simplicidad, pero se pueden mover a CSS
   return (
-  <div className="max-w-sm mx-auto p-6 min-h-screen flex flex-col items-center bg-background text-foreground font-sans">
-  <h1 className="text-5xl font-bold mb-6 text-center">Contador Elecciones</h1>
+  <div className="max-w-sm mx-auto p-6 min-h-screen flex flex-col items-center font-sans">
+    <div className="w-full flex justify-between items-center mb-6">
+      <h1 className="text-5xl font-bold text-center">Contador Elecciones</h1>
+      <button
+        onClick={toggleTheme}
+        className="p-2 rounded-full theme-toggle"
+        aria-label="Cambiar modo"
+      >
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </button>
+    </div>
 
       {/* Barra de porcentaje */}
       <div className="w-full mb-4">
@@ -23,9 +35,9 @@ export default function Home() {
           <span className="text-base">Porcentaje con 10 mesas</span>
           <span className="text-base">{porcentaje}%</span>
         </div>
-        <div className="bg-gray-200 rounded-lg h-4 w-full">
+        <div className="rounded-lg h-4 w-full progress-bar-bg">
           <div
-            className="bg-green-400 h-4 rounded-lg transition-all"
+            className="h-4 rounded-lg transition-all progress-bar"
             style={{ width: `${porcentaje}%` }}
           />
         </div>
@@ -37,7 +49,7 @@ export default function Home() {
         {[...Array(10)].map((_, i) => (
           <button
             key={i + 1}
-            className={`px-3 py-2 rounded-lg font-medium cursor-pointer border ${votantes === i + 1 ? 'border-green-400 bg-green-100' : 'border-gray-300 bg-white'}`}
+            className={`px-3 py-2 rounded-lg font-medium cursor-pointer border votante-btn ${votantes === i + 1 ? 'active' : ''}`}
             onClick={() => { setVotantes(i + 1); setCustomVotantes(""); if (repuestas > i + 1) setRepuestas(i + 1); }}
           >
             {i + 1}
@@ -48,7 +60,7 @@ export default function Home() {
           min={1}
           placeholder="Otro"
           value={customVotantes}
-          className="w-16 px-2 py-2 rounded-lg border border-gray-300"
+          className="w-16 px-2 py-2 rounded-lg border input-custom"
           onChange={e => {
             const value = Number(e.target.value) || 1;
             setCustomVotantes(e.target.value);
@@ -64,7 +76,7 @@ export default function Home() {
         {[...Array(10)].map((_, i) => (
           <button
             key={i + 1}
-            className={`px-3 py-2 rounded-lg font-medium cursor-pointer border ${repuestas === i + 1 ? 'border-blue-400 bg-blue-100' : 'border-gray-300 bg-white'}`}
+            className={`px-3 py-2 rounded-lg font-medium cursor-pointer border repuesta-btn ${repuestas === i + 1 ? 'active' : ''}`}
             onClick={() => { setRepuestas(i + 1 > votantes ? votantes : i + 1); setCustomRepuestas(""); }}
           >
             {i + 1}
@@ -76,7 +88,7 @@ export default function Home() {
           max={votantes}
           placeholder="Otro"
           value={customRepuestas}
-          className="w-16 px-2 py-2 rounded-lg border border-gray-300"
+          className="w-16 px-2 py-2 rounded-lg border input-custom"
           onChange={e => {
             let value = Number(e.target.value) || 1;
             if (value > votantes) value = votantes;
@@ -88,7 +100,7 @@ export default function Home() {
 
       {/* Botón submit */}
       <button
-        className="mt-8 w-full py-3 bg-green-400 text-gray-900 font-bold text-lg rounded-lg cursor-pointer shadow"
+        className="mt-8 w-full py-3 font-bold text-lg rounded-lg cursor-pointer shadow btn-submit"
         onClick={async () => {
           const supabase = createClient();
           const { error } = await supabase.from("reposiciones").insert({

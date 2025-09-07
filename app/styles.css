@@ -1,0 +1,47 @@
+/* Estilos para la aplicación de contador de elecciones */
+
+.progress-bar-bg {
+  background-color: var(--gray-200);
+}
+
+.progress-bar {
+  background-color: var(--green-400);
+}
+
+.votante-btn {
+  border-color: var(--gray-300);
+  background-color: var(--background);
+}
+
+.votante-btn.active {
+  border-color: var(--green-400);
+  background-color: var(--green-100);
+}
+
+.repuesta-btn {
+  border-color: var(--gray-300);
+  background-color: var(--background);
+}
+
+.repuesta-btn.active {
+  border-color: var(--blue-400);
+  background-color: var(--blue-100);
+}
+
+.input-custom {
+  border-color: var(--gray-300);
+  background-color: var(--background);
+}
+
+.btn-submit {
+  background-color: var(--green-400);
+  color: var(--gray-900);
+}
+
+.theme-toggle {
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(30deg);
+}
