@@ -134,12 +134,16 @@ export default function Home() {
       </button>
     ))}
   </div>
+  
+  {/* Espacio para que el botón submit no tape el contenido */}
+  <div className="pb-16"></div>
 
-      {/* Botón submit */}
-      <button
-        className="mt-8 w-full py-4 font-bold rounded-lg cursor-pointer shadow btn-submit submit-button-larger"
-        disabled={isSubmitting || isLoading} // Desactivar el botón mientras se procesa o carga
-        onClick={async () => {
+      {/* Botón submit - ahora en un contenedor fijo */}
+      <div className="submit-container">
+        <button
+          className="w-full py-4 font-bold rounded-lg cursor-pointer shadow btn-submit submit-button-larger"
+          disabled={isSubmitting || isLoading} // Desactivar el botón mientras se procesa o carga
+          onClick={async () => {
           // Evitar múltiples envíos
           if (isSubmitting) return;
           
@@ -179,6 +183,7 @@ export default function Home() {
       >
         {isSubmitting ? "Enviando..." : "Submit"}
       </button>
+      </div>
 
   {/* El porcentaje ahora se actualiza automáticamente */}
     </div>
