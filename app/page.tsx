@@ -61,12 +61,12 @@ export default function Home() {
   // Solo mobile
   // Estilos inline para simplicidad, pero se pueden mover a CSS
   return (
-  <div className="max-w-sm mx-auto p-6 min-h-screen flex flex-col items-center font-sans">
-    <div className="w-full flex justify-between items-center mb-6">
-      <h1 className="text-5xl font-bold text-center">Contador Elecciones</h1>
+  <div className="app-container font-sans">
+    <div className="w-full flex justify-between items-center mb-5">
+      <h1 className="text-4xl font-bold text-center flex-1">Contador Elecciones</h1>
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-full border theme-toggle"
+        className="p-3 rounded-full border theme-toggle text-2xl"
         aria-label="Cambiar modo"
       >
         {theme === 'dark' ? '☀️' : '🌙'}
@@ -74,29 +74,29 @@ export default function Home() {
     </div>
 
       {/* Barra de porcentaje */}
-      <div className="w-full mb-4">
-        <div className="flex justify-between mb-1">
-          <span className="text-base">Porcentaje de mesas totales</span>
-          <span className="text-base">
+      <div className="w-full mb-5">
+        <div className="flex justify-between mb-2">
+          <span className="text-larger">Porcentaje de mesas totales</span>
+          <span className="text-larger font-medium">
             {isLoading ? <span className="loading-text">Cargando...</span> : `${porcentaje}%`}
           </span>
         </div>
-        <div className="rounded-lg h-4 w-full progress-bar-bg">
+        <div className="rounded-lg h-6 w-full progress-bar-bg">
           <div
-            className="h-4 rounded-lg transition-all progress-bar"
+            className="h-6 rounded-lg transition-all progress-bar"
             style={{ width: isLoading ? '0%' : `${porcentaje}%` }}
           />
         </div>
-        {isLoading && <p className="text-sm mt-1 text-center loading-text">Cargando datos iniciales...</p>}
+        {isLoading && <p className="text-larger mt-2 text-center loading-text">Cargando datos iniciales...</p>}
       </div>
 
   {/* Votantes */}
-  <h2 className="text-lg mt-6 mb-2">Votantes que pasaron a cuarto oscuro</h2>
-  <div className="flex gap-2 flex-wrap mb-2">
+  <h2 className="section-title mt-6 mb-3">Votantes que pasaron a cuarto oscuro</h2>
+  <div className="flex gap-3 flex-wrap mb-4">
         {[...Array(10)].map((_, i) => (
           <button
             key={i + 1}
-            className={`px-3 py-2 rounded-lg font-medium cursor-pointer border votante-btn ${votantes === i + 1 ? 'active' : ''}`}
+            className={`px-4 py-3 rounded-lg font-medium cursor-pointer border button-larger votante-btn ${votantes === i + 1 ? 'active' : ''}`}
             onClick={() => { setVotantes(i + 1); setCustomVotantes(""); if (repuestas > i + 1) setRepuestas(i + 1); }}
           >
             {i + 1}
@@ -107,7 +107,7 @@ export default function Home() {
           min={1}
           placeholder="Otro"
           value={customVotantes}
-          className="w-16 px-2 py-2 rounded-lg border input-custom"
+          className="w-20 px-3 py-3 rounded-lg border input-custom input-larger"
           onChange={e => {
             const value = Number(e.target.value) || 1;
             setCustomVotantes(e.target.value);
@@ -117,13 +117,13 @@ export default function Home() {
         />
       </div>
 
-  {/* Voletas repuestas */}
-  <h2 className="text-lg mt-6 mb-2">Boletas repuestas</h2>
-  <div className="flex gap-2 flex-wrap mb-2">
+  {/* Boletas repuestas */}
+  <h2 className="section-title mt-6 mb-3">Boletas repuestas</h2>
+  <div className="flex gap-3 flex-wrap mb-4">
         {[...Array(10)].map((_, i) => (
           <button
             key={i + 1}
-            className={`px-3 py-2 rounded-lg font-medium cursor-pointer border repuesta-btn ${repuestas === i + 1 ? 'active' : ''}`}
+            className={`px-4 py-3 rounded-lg font-medium cursor-pointer border button-larger repuesta-btn ${repuestas === i + 1 ? 'active' : ''}`}
             onClick={() => { setRepuestas(i + 1 > votantes ? votantes : i + 1); setCustomRepuestas(""); }}
           >
             {i + 1}
@@ -135,7 +135,7 @@ export default function Home() {
           max={votantes}
           placeholder="Otro"
           value={customRepuestas}
-          className="w-16 px-2 py-2 rounded-lg border input-custom"
+          className="w-20 px-3 py-3 rounded-lg border input-custom input-larger"
           onChange={e => {
             let value = Number(e.target.value) || 1;
             if (value > votantes) value = votantes;
@@ -147,14 +147,14 @@ export default function Home() {
 
       {/* Botón submit */}
       <button
-        className="mt-8 w-full py-3 font-bold text-lg rounded-lg cursor-pointer shadow btn-submit"
+        className="mt-8 w-full py-4 font-bold rounded-lg cursor-pointer shadow btn-submit submit-button-larger"
         disabled={isSubmitting || isLoading} // Desactivar el botón mientras se procesa o carga
         onClick={async () => {
           // Evitar múltiples envíos
           if (isSubmitting) return;
           
           setIsSubmitting(true); // Indicar que está en proceso
-          
+          alert("¡Datos enviados correctamente!");
           try {
             const supabase = createClient();
             const { error } = await supabase.from("reposiciones").insert({
