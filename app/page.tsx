@@ -12,6 +12,7 @@ export default function Home() {
   const [customVotantes, setCustomVotantes] = useState("");
   const [repuestas, setRepuestas] = useState(1);
   const [customRepuestas, setCustomRepuestas] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío
   const { theme, toggleTheme } = useTheme();
 
   // Solo mobile
@@ -101,7 +102,13 @@ export default function Home() {
       {/* Botón submit */}
       <button
         className="mt-8 w-full py-3 font-bold text-lg rounded-lg cursor-pointer shadow btn-submit"
+        disabled={isSubmitting} // Desactivar el botón mientras se procesa
         onClick={async () => {
+          // Evitar múltiples envíos
+          if (isSubmitting) return;
+          
+          setIsSubmitting(true); // Indicar que está en proceso
+          
           const supabase = createClient();
           const { error } = await supabase.from("reposiciones").insert({
             mesa_id: "prueba",
@@ -110,6 +117,7 @@ export default function Home() {
           });
           if (error) {
             alert("Error al subir los datos: " + error.message);
+            setIsSubmitting(false); // Restablecer el estado en caso de error
             return;
           }
           // Consulta directa para calcular el porcentaje
@@ -118,15 +126,18 @@ export default function Home() {
             .select("boletas_repuestas, votantes_contados");
           if (queryError) {
             alert("Error al obtener datos: " + queryError.message);
+            setIsSubmitting(false); // Restablecer el estado en caso de error
             return;
           }
           const totalBoletas = queryData.reduce((acc, row) => acc + (row.boletas_repuestas || 0), 0);
           const totalVotantes = queryData.reduce((acc, row) => acc + (row.votantes_contados || 0), 0);
           const porcentajeCalc = totalVotantes > 0 ? (totalBoletas / totalVotantes) * 100 : 0;
           setPorcentaje(Number(porcentajeCalc.toFixed(2)));
+          
+          setIsSubmitting(false); // Restablecer el estado cuando se completa
         }}
       >
-        Submit
+        {isSubmitting ? "Enviando..." : "Submit"}
       </button>
 
   {/* El porcentaje ahora se actualiza automáticamente */}
