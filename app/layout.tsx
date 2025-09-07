@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./context/ThemeContext";
-import { PWAProvider } from "./components/PWAProvider";
+import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,28 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Contador Elecciones",
   description: "Aplicación para contar resultados de elecciones",
-  manifest: "/manifest.json",
-  themeColor: "#4ade80",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Contador Elecciones",
-  },
-  formatDetection: {
-    telephone: false,
-  },
-  openGraph: {
-    type: "website",
-    siteName: "Contador Elecciones",
-    title: "Contador Elecciones",
-    description: "Aplicación para contar resultados de elecciones",
-  },
-  twitter: {
-    card: "summary",
-    title: "Contador Elecciones",
-    description: "Aplicación para contar resultados de elecciones",
-  },
 };
 
 export default function RootLayout({
@@ -46,16 +24,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+        });
+    }
+  }, []);
+
   return (
     <html lang="es">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PWAProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </PWAProvider>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
